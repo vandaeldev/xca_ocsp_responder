@@ -1,0 +1,8 @@
+(
+  database_path: "/etc/sqlite/example.xdb",
+  bind_host: "0.0.0.0",
+  bind_port: 5396,
+  max_cache_ttl: 2_462_400,
+  cache_cap: 1000,
+  num_workers: 1,
+)
