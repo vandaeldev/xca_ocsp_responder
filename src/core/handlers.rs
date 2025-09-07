@@ -1,25 +1,19 @@
-use std::time::Duration;
-
 use actix_web::{
     HttpRequest, HttpResponse, Responder,
     http::header::{self, ContentEncoding},
     web::Path,
 };
-use tokio::time::sleep;
 
-use crate::core::{
-    cache::CrlCacheEntry,
+use super::{
+    cache::{CrlCacheEntry, crl_cache},
+    database::fetch_crl,
     util::{accepts_gzip, crl_expiration, etag_matches, since_matches},
 };
 
-use super::{cache::crl_cache, database::fetch_crl};
-
 pub async fn send_crl(crl_file: Path<String>, req: HttpRequest) -> impl Responder {
-    sleep(Duration::from_secs(5)).await;
     let crl_name = crl_file.into_inner();
     let cache = crl_cache();
     let crl_result = if let Some(cached) = cache.get(&crl_name) {
-        println!("From cache: '{}'", &cached.hash);
         Ok(Some(cached))
     } else {
         fetch_crl(&crl_name)
@@ -28,7 +22,6 @@ pub async fn send_crl(crl_file: Path<String>, req: HttpRequest) -> impl Responde
                 Some(crl) => {
                     let crl_entry = CrlCacheEntry::from_crl(crl)?;
                     cache.insert(&crl_name, crl_entry.clone());
-                    println!("From database: '{}'", &crl_entry.hash);
                     Ok(Some(crl_entry))
                 }
                 None => Ok(None),

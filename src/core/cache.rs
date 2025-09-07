@@ -9,9 +9,10 @@ use der::Encode;
 use moka::{Expiry, sync::Cache};
 use x509_cert::crl::CertificateList;
 
-use crate::core::util::{crl_hash, duration_from_creation, gzip_der};
-
-use super::config::{Config, config};
+use super::{
+    config::{Config, config},
+    util::{crl_hash, duration_from_creation, gzip_der},
+};
 
 const CACHE_REFRESH_FACTOR: f32 = 0.95;
 
